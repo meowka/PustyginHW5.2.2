@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">HW5.2.2</string>
+    <string name="prompt_email">Login</string>
+    <string name="prompt_password">Password</string>
+    <string name="welcome">"Welcome!"</string>
+    <string name="register">Register</string>
+    <string name="action_sign_in">Login</string>
+    <string name="saveCheck">Хранить логин во внешнем хранилище</string>
+</resources>
