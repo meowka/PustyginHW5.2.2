@@ -6,8 +6,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -60,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private File getExternalPath() {
-        return(new File(Environment.getExternalStorageDirectory(), loginFile));
+        return (new File(getExternalFilesDir("myFileDir"), loginFile));
     }
 
     private void init() {
@@ -97,96 +95,106 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        }else {
-            if(!permissionGranted){
+        } else {
+            if (!permissionGranted) {
                 checkPermissions();
-                return;
             }
-                FileOutputStream fos = null;
-                try {
-                    usernameStr = usernameEditText.getText().toString() + "\n" + passwordEditText.getText().toString();
-                    fos = new FileOutputStream(getExternalPath());
-                    fos.write(usernameStr.getBytes());
-//                Toast.makeText(MainActivity.this, "register !", Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+            FileOutputStream fos = null;
+            try {
+                usernameStr = usernameEditText.getText().toString() + "\n" + passwordEditText.getText().toString();
+                fos = new FileOutputStream(getExternalPath());
+                fos.write(usernameStr.getBytes());
+                Toast.makeText(MainActivity.this, "register !", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
+        }
     }
 
     public void loginClick(View view) {
 
         FileInputStream fileInputStream = null;
-        if (!saveCheck.isChecked()){
-        try {
-            usernameStr = usernameEditText.getText().toString();
-            fileInputStream = openFileInput(loginFile);
-            byte[] bytesLogin = new byte[fileInputStream.available()];
-            fileInputStream.read(bytesLogin);
-            String openLogin = new String(bytesLogin);
-            String [] equalsLogin = openLogin.split("\n");
-            if (equalsLogin[0].equals(usernameStr) && equalsLogin[1].equals(passwordEditText.getText().toString())) {
-                Toast.makeText(MainActivity.this, "welcome", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(MainActivity.this, "Error login or password", Toast.LENGTH_SHORT).show();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        if (!saveCheck.isChecked()) {
+            try {
+                usernameStr = usernameEditText.getText().toString();
+                fileInputStream = openFileInput(loginFile);
+                byte[] bytesLogin = new byte[fileInputStream.available()];
+                fileInputStream.read(bytesLogin);
+                String openLogin = new String(bytesLogin);
+                String[] equalsLogin = openLogin.split("\n");
+                if (equalsLogin[0].equals(usernameStr) && equalsLogin[1].equals(passwordEditText.getText().toString())) {
+                    Toast.makeText(MainActivity.this, "welcome", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Error login or password", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (fileInputStream != null) {
+                    try {
+                        fileInputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+        } else {
+            try {
+                usernameStr = usernameEditText.getText().toString();
+                fileInputStream = new FileInputStream(getExternalPath());
+                byte[] bytesLogin = new byte[fileInputStream.available()];
+                fileInputStream.read(bytesLogin);
+                String openLogin = new String(bytesLogin);
+                String[] equalsLogin = openLogin.split("\n");
+                if (equalsLogin[0].equals(usernameStr) && equalsLogin[1].equals(passwordEditText.getText().toString())) {
+                    Toast.makeText(MainActivity.this, "welcome", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Error login or password", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        else{
-
-        }
     }
 
-    public boolean isExternalStorageWriteable(){
+    public boolean isExternalStorageWriteable() {
         String state = Environment.getExternalStorageState();
-        return  Environment.MEDIA_MOUNTED.equals(state);
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
-    public boolean isExternalStorageReadable(){
+    public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        return  (Environment.MEDIA_MOUNTED.equals(state) ||
+        return (Environment.MEDIA_MOUNTED.equals(state) ||
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 
-    private boolean checkPermissions(){
-        if(!isExternalStorageReadable() || !isExternalStorageWriteable()){
+    private void checkPermissions() {
+        if (!isExternalStorageReadable() || !isExternalStorageWriteable()) {
             Toast.makeText(this, "Внешнее хранилище не доступно", Toast.LENGTH_LONG).show();
-            return false;
+            return;
         }
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(permissionCheck!= PackageManager.PERMISSION_GRANTED){
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_WRITE);
-            return false;
         }
-        return true;
     }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
-        switch (requestCode){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
             case REQUEST_PERMISSION_WRITE:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     permissionGranted = true;
                     Toast.makeText(this, "Разрешения получены", Toast.LENGTH_LONG).show();
-                }
-                else{
+                } else {
                     Toast.makeText(this, "Необходимо дать разрешения", Toast.LENGTH_LONG).show();
                 }
                 break;
