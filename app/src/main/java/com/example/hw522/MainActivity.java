@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 usernameStr = usernameEditText.getText().toString() + "\n" + passwordEditText.getText().toString();
                 fos = new FileOutputStream(getExternalPath());
                 fos.write(usernameStr.getBytes());
-                Toast.makeText(MainActivity.this, "register !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "register done!", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
