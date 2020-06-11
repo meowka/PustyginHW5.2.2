@@ -6,4 +6,6 @@
     <string name="register">Register</string>
     <string name="action_sign_in">Login</string>
     <string name="saveCheck">Хранить логин во внешнем хранилище</string>
+    <string name="error">Error login or password</string>
+    <string name="RegDone">register done!</string>
 </resources>
